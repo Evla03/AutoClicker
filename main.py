@@ -1,6 +1,7 @@
 import wx
 from ui.wxUI import EventedUIFrame, UICredits
 from clicker import Clicker
+from hotkeys import Hotkey
 
 buttons = ("left", "right", "middle")
 units = (1000, 1, 1 / 60, 1 / 3600)
@@ -18,11 +19,25 @@ class ScriptedEventedUIFrame(EventedUIFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.clicker = Clicker()
+        self.hotkey = Hotkey(self.toggle)
         self.delay = float(self.input_delay.Value)
         self.credit_frame = EventedUICredits(self)
+        self.toggled = False
 
     def enable_clicker(self, event):
         if event.IsChecked():
+            self.toggled = True
+            self.check_toggled()
+        else:
+            self.toggled = False
+            self.check_toggled()
+
+    def toggle(self):
+        self.toggled = not self.toggled
+        self.check_toggled()
+
+    def check_toggled(self):
+        if self.toggled:
             self.button_start.SetLabel(f"[{self.button_start.GetLabel()}]")
             button = buttons[self.button_select_choice.GetSelection()]
             delay = self.delay / units[self.timeunit_choice.GetSelection()]
